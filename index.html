@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>project 1</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="manifest" href="manifest.json">
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="application-name" content="Space Missions">
+        <meta name="apple-mobile-web-app-title" content="Space Missions">
+        <meta name="theme-color" content="#FF9800">
+        <meta name="msapplication-navbutton-color" content="#FF9800">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="msapplication-starturl" content="/index.html">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      
+        <link rel="icon" sizes="128x128" href="/touch/icon-128x128.png">
+        <link rel="apple-touch-icon" sizes="128x128" href="/touch/icon-128x128.png">
+        <link rel="icon" sizes="192x192" href="icon-192x192.png">
+        <link rel="apple-touch-icon" sizes="192x192" href="/touch/icon-192x192.png">
+        <link rel="icon" sizes="256x256" href="/touch/icon-256x256.png">
+        <link rel="apple-touch-icon" sizes="256x256" href="/touch/icon-256x256.png">
+        <link rel="icon" sizes="384x384" href="/touch/icon-384x384.png">
+        <link rel="apple-touch-icon" sizes="384x384" href="/touch/icon-384x384.png">
+        <link rel="icon" sizes="512x512" href="/touch/icon-512x512.png">
+        <link rel="apple-touch-icon" sizes="512x512" href="/touch/icon-512x512.png">
+
+        <link rel="modulepreload" href="index.js">
+        <link rel="modulepreload" href="http.js">
+
+        <style>
+            header nav li {
+                display: inline-block;
+                
+            }
+            .dragAndDrop {
+                /* width: 300px; */
+                height: 300px;
+                background-color: lightcyan;            
+            }
+            main {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            @media screen and (max-width: 680px) {
+                main {
+                    flex-direction: column;
+                }
+            }
+
+            div.carousel {
+                width: 400px;
+                overflow: hidden;
+            }
+
+            div.items {
+                display: flex;
+                align-items: center;                
+                height: 150px;
+                touch-action: none;
+                will-change: transform;
+            }
+
+            div.items img {
+                height: auto;
+                touch-action: auto;
+            }
+
+            div.selection {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 10px;
+                background-color: rgb(100, 100, 200, 0.5)
+            }
+
+            div.selection button {
+                display: block;
+                margin: 0 auto;
+            }
+
+            .modal {
+                width: 100vw;
+                height: 100vh;
+                position: fixed;
+                top: 0;
+                left: 0;
+                background-color: rgba(3, 0, 0, 0.5)
+            }
+
+            div.modal-body {
+                width: 400px;            
+                position: absolute;
+                top: 0;
+                left: calc(50vw - 200px);
+            }
+
+            .modal-body h2:focus,
+            .modal-body button:focus {
+                    outline: solid lightblue;
+            }
+            
+            #slider {
+                width: 140px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #fbe;
+                touch-action: none;                
+            }
+        </style>
+
+        <script src="index.js" type="module"></script>
+    </head>
+    <body>
+        <header>
+            <nav id="unknownUser" aria-labelledby="primary-navigation">
+                <h2 id="primary-navigation"> Register or Login </h2>
+                <ul>
+                    <li>
+                        <a href="authorization.html/?mode=register">Register</a>
+                    </li>
+                    <li>
+                        <a href="authorization.html/?mode=login">Login</a>
+                    </li>
+                </ul>         
+            </nav>
+        </header>
+
+        <!-- template's elements are parsed but not rendered -->
+        <template id="loggedIn">
+            <nav aria-labelledby="logged-navigation">
+                <h2 id="logged-navigation">Logged In as:</h2>
+                <div id="username"></div>
+                <a href="authorization.html/?mode=logout">log out</a>
+            </nav>
+        </template>
+
+        <main>
+
+        
+        <section>
+            <h2 id="dropdiv">Drag and Drop Files</h2>
+            <div class="dragAndDrop" aria-labelledby="dropdiv"></div>
+        </section>
+
+        <section>
+            <div class="carousel">
+                <h2 id="available">Available items</h2>
+                <div class="items" aria-labelledby="available">
+                </div>  
+                <div class="selection">
+                    <button>select</button>
+                </div>              
+            </div> 
+        </section>       
+        
+        </main>
+
+      <template id="modal">
+          <div class="modal">
+            <div class="modal-body" role="dialog">
+                <h2 tabindex="0">Image Modal</h2>
+                <img width="400" src="" alt="dog">
+                <button>close</button>
+                <button>save</button>
+            </div>
+          </div>
+          
+      </template>
+
+       <script type="text/javascript" src="carousel.js"></script>
+
+        <script type="text/javascript">
+
+        if(window.navigator.serviceWorker) {
+            window.navigator.serviceWorker.register('sw.js').then((registration) => {
+                console.log(registration.waiting, registration.installing, registration.active, registration.scope);
+            })
+        }
+            
+            
+           /*  const img = document.querySelector('img');
+                                 
+            let startX;
+
+            let startY;
+
+            const hasPointer = !!window.PointerEvent;
+
+            let isRafPending = false;
+
+            function setListener(event) { 
+               event.preventDefault();
+
+                if(!startX) {   
+                    if(!event.touches) {
+                        startX = event.clientX;
+                        startY= event.clientY;  
+                    } else {
+                    const t = [].slice.call(event.targetTouches,0).find((touch) => touch.target === img);
+                    startX = t.clientX;
+                    startY = t.clientY;
+                    }
+                }
+                if(hasPointer){ 
+                    img.addEventListener('pointermove', followMove, true);    
+                    img.setPointerCapture(event.pointerId);
+                } else {
+                   if(event.touches) {
+                        console.log('touches')
+                        img.addEventListener('touchmove', followMove, true);
+                   } else {
+                        // img.addEventListener('mousemove', followMove, true);
+                        document.body.addEventListener('mousemove', followMove, true);
+                        document.body.addEventListener('mouseup', endMove,  true); 
+                   }
+                   
+                }
+                 
+            }
+
+            function followMove(evt) {                
+                // console.log(evt)
+                evt.preventDefault();
+
+                let clientX, clientY;
+
+                if(isRafPending) {
+                        return;
+                    }
+                isRafPending = true;
+
+                if(evt.touches) {
+                    const t = [].slice.call(evt.targetTouches,0).find((touch) => touch.target === img);
+                    ({clientX, clientY} = t);                   
+                } else {
+                    ({clientX, clientY} = evt); 
+                }
+                // console.log(clientX, clientY);
+
+                requestAnimationFrame(function () {
+                    if(!isRafPending) {
+                            return;
+                        }
+                    isRafPending = false;
+                    img.style.transform=`translate(${clientX - startX}px, ${clientY - startY}px)`; 
+                });  
+                          
+            }          
+           
+            function endMove(evt) {
+                if(event.touches && !hasPointer) {                    
+                   // return;
+                   img.removeEventListener('touchMove', followMove, true);
+                   return;
+                }
+                if(hasPointer) {
+                    console.log('pointerup');
+                    console.log(evt.pointerId);
+                    img.removeEventListener('pointermove', followMove, true);
+                    img.releasePointerCapture(evt.pointerId);
+                } else {
+                    console.log('mouseup');
+                    document.body.removeEventListener('mousemove', followMove, true);
+                    document.body.removeEventListener('mouseup', endMove, true);
+                }
+            }
+           
+           if(hasPointer) { 
+            img.addEventListener('pointerdown', setListener, true);                    
+            img.addEventListener('pointerup', endMove, true);            
+            img.addEventListener('pointercancel', endMove, true)
+           } else {
+                img.addEventListener('touchstart', setListener, true);
+                img.addEventListener('touchend', endMove, true);
+                img.addEventListener('touchcancel', endMove, true);
+                
+                img.addEventListener('mousedown', setListener, true);
+
+                
+               }         */      
+
+           
+           
+
+            
+            
+            
+        </script>
+        
+    </body>
+</html>

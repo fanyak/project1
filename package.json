@@ -1,0 +1,37 @@
+{
+  "name": "project1",
+  "version": "1.0.0",
+  "description": "ptat",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fanyak/project1.git"
+  },
+  "keywords": [
+    "revision"
+  ],
+  "author": "Fani Akritidou",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fanyak/project1/issues"
+  },
+  "homepage": "https://github.com/fanyak/project1#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "etag": "^1.8.1",
+    "formidable": "^1.2.1",
+    "imagemin": "^7.0.1",
+    "imagemin-mozjpeg": "^8.0.0",
+    "imagemin-pngquant": "^8.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mime-types": "^2.1.26",
+    "svgo": "^1.3.2"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2"
+  }
+}

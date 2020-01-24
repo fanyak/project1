@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>video</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="preload" as="video"  href="https://interactive-examples.mdn.mozilla.net/media/examples/flower.webm" type="video/webm">
+        <link rel="preload" as="video"  href="https://interactive-examples.mdn.mozilla.net/media/examples/flower.mp4" type="video/mp4">
+        <link rel="preload" as="font" href="https://weloveiconfonts.com/api/?family=iconicstroke" crossorigin>
+
+        <link rel="stylesheet" href="https://weloveiconfonts.com/api/?family=iconicstroke">
+
+        <style>
+            body {
+                margin: 0;
+            }
+
+            .videocontainer {
+                margin: 0 auto;
+                max-width: 800px;
+                height: auto;
+                position: relative;
+            }
+            video {
+                max-width: 100%;
+                height: auto;
+            }
+
+            @media sceen and (max-width: 800px) {
+                .videocontainer {
+                    max-width: 90%;
+                }
+            }
+
+            .videocontainer .controls {
+                display: flex;
+                width: 100%;
+                height: auto;
+                position: absolute;
+                top: 50%;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .prev:before,
+            .play:before,
+            .next:before, 
+            .fs:before {
+                font-family:'iconicstroke', sans-serif;
+                color: #ffffff;
+                font-size: 2rem;
+                cursor: pointer;
+                /* opacity: 0;
+                transition: opacity 0.5s linear; */
+            }
+
+            /* .videocontainer:hover div:before {
+                opacity: 1;
+            } */
+
+           
+            .fs:before {
+                color: black;
+            }
+
+            .progress {
+                width: 1px;
+                height: 5px;
+                border-radius: 5px;
+                will-change: transform;
+                background-color: black;
+                transform-origin: left;                
+            }
+
+            progress {
+                background-color: lightcyan;
+                touch-action: none;
+            }
+                
+            header a {
+                color: blue;
+                opacity: 0;
+                transition: opacity 0.5 linear;
+            }
+
+            header a:focus {
+                opacity: 1;
+            }
+            
+        </style>
+
+    </head>
+    <body>
+       <header>
+           <a href="../index.html" arial-label="return to home page">Return to home page</a>
+       </header> 
+       <main>
+        <div class="videocontainer">       
+           <video preload>
+                <source src="https://interactive-examples.mdn.mozilla.net/media/examples/flower.webm" type="video/webm">
+                <source src="https://interactive-examples.mdn.mozilla.net/media/examples/flower.mp4" type="video/mp4">
+           </video>
+           <div class="controls" aria-label="video controls">
+               <div class="prev iconicstroke-first" tabindex="0" aria-label='previous'>
+               </div>
+               <div class="play iconicstroke-play" tabindex="0" aria-label="play">
+               </div>
+               <div class="next iconicstroke-last" tabindex="0" aria-label="next">
+               </div>
+           </div>
+           <!-- <div class="progress">
+           </div> -->
+           <progress value="0" max="" min="0"></progress>
+
+           <div class="fs iconicstroke-fullscreen" tabindex="0" aria-label="fullScreen"></div>
+        </div> 
+
+       </main>
+       <footer>
+
+       </footer>
+
+       <script>
+
+            const video = document.body.querySelector('video');
+            const play = document.body.querySelector('.play');
+            const next = document.body.querySelector('.next');
+            const previous = document.body.querySelector('.prev');
+            // const progress = document.body.querySelector('.progress');
+            const progress = document.body.querySelector('progress');
+
+            ;const fullScreen = document.body.querySelector('.fs');
+
+            let duration = video.duration;
+            let width = Math.min(window.innerWidth, 800); // initial value = 0;
+            let segmentLength = 1;
+
+            let isPlaying = false;
+
+            console.log('d', video.duration)
+
+            if(video.duration) {
+                handleVideo();
+            }
+
+            video.addEventListener('loadedmetadata', function(e) {
+                duration = video.duration;
+                console.log('duration', duration, video.width);
+                width = Math.min(window.innerWidth, 800);
+                handleVideo();
+            }, false);
+
+
+            function handleVideo() {
+
+                progress.max =  duration;
+                progress.style.width = `${width}px`;
+
+                play.addEventListener('click', function clicked(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log(e)
+                if(!isPlaying) {
+                    video.play().then((e) => console.log('playing', e));
+                    return;
+                } 
+                video.pause();
+            }, false);
+
+                next.addEventListener('click', function next(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log(segmentLength)
+                        n = video.currentTime + segmentLength;
+                        video.currentTime = Math.min(n, video.duration);
+                }, false);
+
+                previous.addEventListener('click', function previous(e){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    n = video.currentTime - segmentLength;
+                    video.currentTime = Math.max(0, n);
+                }, false);
+
+                if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    video.addEventListener('timeupdate', (e) => {
+                    // let scale = e.target.currentTime * (width / video.duration);
+                    /* let scale = (e.target.currentTime / e.target.duration) * 100;
+                    console.log(e.target.currentTime, scale);
+
+                   // progress.style.transform = `scaleX(${scale})`;
+                    requestAnimationFrame(() => {
+                        // progress.style.transform = `scaleX(${scale})`;
+                        progress.style.width = `${scale}%`;
+                    }); */
+                    // progress.style.width = `${scale}px`;
+                    progress.value = e.target.currentTime;
+                }, false);
+
+                }
+
+                
+                video.addEventListener('ended', function(e) {
+                    isPlaying = false;
+                   /*  requestAnimationFrame(() => {
+                        progress.style.transform = `unset`;
+                        progress.style.width = `${width}px`;
+                    });  */                  
+                }, false);
+
+                video.addEventListener('play', function(e) {
+                    isPlaying = true;
+                }, false);
+
+                video.addEventListener('pause', function(e) {
+                    isPlaying = false;
+                }, false);
+
+                
+                fullScreen.addEventListener('click', (e) => {
+                    console.log(document.fullscreen);
+                    if(!document.fullscreen) {
+                        video.requestFullscreen();
+                        video.controls = 'true';
+                    }
+                }, false);
+
+                document.addEventListener('fullscreenchange', (_) => {
+                    if(!document.fullscreen) {
+                        video.removeAttribute('controls');
+                    }                    
+                }, false);
+
+                let initialPoint = 0;
+                let hasPointer = false; window.PointerEvent;
+
+                if(hasPointer) {
+                    progress.addEventListener('pointerdown', touchstart, true);
+                    progress.addEventListener('pointerup', touchend, true);
+                } else {
+                    progress.addEventListener('touchstart', touchstart, {passive: true});
+                    progress.addEventListener('touchend', touchend, true);
+
+                    progress.addEventListener('mousedown', touchstart, true);
+                }
+
+                function touchstart(e) {
+                    e.preventDefault();
+                    console.log(e);
+                    if(hasPointer || !e.touches) {
+                        initialPoint = e.clientX;
+                        if(hasPointer) {
+                            progress.setPointerCapture(e.pointerId);
+                            progress.addEventListener('pointermove', touchmove, true);
+
+                        } else {
+                            document.body.addEventListener('mousemove', touchmove, true);
+                            document.body.addEventListener('mouseup', touchend, true);
+                        }
+                    } else {
+                        const touches = Array.from(e.targetTouches);
+                        const t = touches.find(touch => touch.target === progress);
+                        initialPoint = t.clientX;
+                        progress.addEventListener('touchmove', touchmove, true);
+                    }
+
+                }
+
+                function touchmove(e) {
+                    let diff = 0;
+                    if(e.touches) {
+                        const touches = Array.from(e.targetTouches);
+                        const t = touches.find(touch => touch.target === progress);
+                        diff = t.clientX - initialPoint;
+                    } else {
+                        diff = e.clientX - initialPoint;
+                    }
+                    initialPoint += diff;
+                    video.currentTime += (diff * (video.duration/width));
+                }
+
+                function touchend(e) {
+                    if(hasPointer) {
+                        progress.releasePointerCapture(e.pointerId);
+                        progress.removeEventListener('pointermove', touchmove, tue);
+                    } else {
+                        if(!e.touches) {
+                            document.body.removeEventListener('mousemove', touchmove, true);
+                            document.body.removeEventListener('mouseup', touchend, true);
+                        } else {
+                            progress.removeEventListener('touchmove', touchmove, true);
+                        }
+                    }
+                }
+            }
+
+            
+       
+       </script>
+    </body>
+</html>
